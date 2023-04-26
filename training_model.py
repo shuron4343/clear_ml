@@ -33,7 +33,7 @@ def main(min_neighbors: int, max_neighbors: int) -> None:
     test_X = scaler.transform(test_X)
     joblib.dump(scaler, 'models/scaler.pkl')
     
-    reducer = umap.UMAP(n_components=5, random_state=42, n_neighbors=10)
+    reducer = umap.UMAP(n_components=2, random_state=42, n_neighbors=10)
     reducer.fit(train_X, train_y)
     train_X = reducer.transform(train_X)
     test_X = reducer.transform(test_X)
