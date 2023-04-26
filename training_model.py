@@ -7,7 +7,7 @@ import pandas as pd
 import typer
 import umap
 from clearml import Logger, Task
-from sklearn.datasets import fetch_covtype
+from sklearn.datasets import load_digits
 from sklearn.metrics import roc_auc_score
 from sklearn.model_selection import train_test_split
 from sklearn.multiclass import OneVsRestClassifier
@@ -16,12 +16,12 @@ from sklearn.preprocessing import StandardScaler
 
 
 def load_data() -> Tuple[pd.DataFrame, pd.DataFrame]:
-    return fetch_covtype(as_frame=True, return_X_y=True)
+    return load_digits(as_frame=True, return_X_y=True)
 
 
 def main(min_neighbors: int, max_neighbors: int) -> None:
     Task.set_random_seed(42)
-    task = Task.init(project_name="covtype-training", task_name="covtype-training")
+    task = Task.init(project_name="digits-training", task_name="training")
     logger = Logger.current_logger()
     X, y = load_data()
     task.upload_artifact(name='Training data', artifact_object=pd.concat([X, y], axis=1))
@@ -33,7 +33,7 @@ def main(min_neighbors: int, max_neighbors: int) -> None:
     test_X = scaler.transform(test_X)
     joblib.dump(scaler, 'models/scaler.pkl')
     
-    reducer = umap.UMAP(n_components=2, random_state=42, n_neighbors=10)
+    reducer = umap.UMAP(n_components=5, random_state=42, n_neighbors=15)
     reducer.fit(train_X, train_y)
     train_X = reducer.transform(train_X)
     test_X = reducer.transform(test_X)
