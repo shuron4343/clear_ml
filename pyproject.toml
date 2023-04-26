@@ -1,0 +1,27 @@
+[tool.pdm]
+[tool.pdm.dev-dependencies]
+jyputer = [
+    "ipykernel>=6.22.0",
+    "nbconvert>=7.3.1",
+]
+sys_cert = [
+    "pip-system-certs>=4.0",
+]
+
+[project]
+name = ""
+version = ""
+description = ""
+authors = [
+    {name = "Лекомцев Александр Юрьевич", email = "ayulekomtsev@bank-hlynov.ru"},
+]
+dependencies = [
+    "scikit-learn>=1.2.2",
+    "pandas[performance]>=2.0.0",
+    "clearml>=1.10.3",
+    "seaborn>=0.12.2",
+    "typer>=0.7.0",
+    "umap-learn>=0.5.3",
+]
+requires-python = ">=3.8,<3.12"
+license = {text = "MIT"}
