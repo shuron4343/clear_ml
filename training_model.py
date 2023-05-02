@@ -4,6 +4,8 @@ import joblib
 # import matplotlib.pyplot as plt
 import pandas as pd
 # import seaborn as sns
+import numpy as np
+import requests
 import typer
 import umap
 from clearml import Logger, Task
