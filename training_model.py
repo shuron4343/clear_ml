@@ -10,17 +10,17 @@ import requests
 # import typer
 import umap
 from clearml import TaskTypes
-from clearml.automation.controller import PipelineDecorator
+# from clearml.automation.controller import PipelineDecorator
 # from sklearn.datasets import load_digits
 # from sklearn.metrics import roc_auc_score
-from sklearn.model_selection import train_test_split
+# from sklearn.model_selection import train_test_split
 # from sklearn.multiclass import OneVsRestClassifier
 # from sklearn.neighbors import KNeighborsClassifier
 from sklearn.preprocessing import StandardScaler
+from clearml import PipelineController
 
-@PipelineDecorator.component(return_values=['X, y'], cache=True, task_type=TaskTypes.data_processing)
+
 def load_data() -> pd.DataFrame:
-    print('Step one')
 
     from pathlib import Path 
     from clearml import Dataset
@@ -37,9 +37,7 @@ def load_data() -> pd.DataFrame:
     return df, y
 
 
-@PipelineDecorator.component(return_values=['model'], cache=True, task_type=TaskTypes.training)
 def train_model(min_neighbors, max_neighbors, train_X, test_X, train_y, test_y):
-    print('step four')
 
     from clearml import Logger
     import joblib
@@ -49,7 +47,7 @@ def train_model(min_neighbors, max_neighbors, train_X, test_X, train_y, test_y):
 
     logger = Logger.current_logger()
     best_model = {'best_model': None, 'best_roc': 0}
-    for n in range(min_neighbors, max_neighbors + 1):
+    for n in range(int(min_neighbors), int(max_neighbors) + 1):
         print(f'Training model with {n} neighbors')
         model = OneVsRestClassifier(KNeighborsClassifier(n_neighbors=n, weights='distance'))
         model.fit(train_X, train_y)
@@ -67,58 +65,136 @@ def train_model(min_neighbors, max_neighbors, train_X, test_X, train_y, test_y):
     return model
 
 
-@PipelineDecorator.component(return_values=['reducer'], cache=True, task_type=TaskTypes.training)
-def fit_reducer(train_X, train_y, *args, **kwargs) -> umap.UMAP:
-    print('step three')
+def fit_reducer(train_X, train_y, n_components=5, random_state=42, n_neighbors=15) -> umap.UMAP:
 
     import joblib
     import umap
 
-    reducer = umap.UMAP(*args, **kwargs)
+    reducer = umap.UMAP(n_components=n_components, random_state=random_state, n_neighbors=n_neighbors)
     reducer.fit(train_X, train_y)
     joblib.dump(reducer, 'models/reducer.pkl')
     return reducer
 
 
-@PipelineDecorator.component(return_values=['scaler'], cache=True, task_type=TaskTypes.training)
-def fit_scaler(train_X, *args, **kwargs) -> StandardScaler:
-    print('step two')
+def fit_scaler(train_X) -> StandardScaler:
 
     import joblib
     from sklearn.preprocessing import StandardScaler
     
-    scaler = StandardScaler(*args, **kwargs)
+    scaler = StandardScaler()
     scaler.fit(train_X)
     joblib.dump(scaler, 'models/scaler.pkl')
     return scaler
 
 
-@PipelineDecorator.pipeline(
-        name='training_pipeline', project='digits-training', version='0.1',
-        args_map={'min': ['min_neighbors'], 'max': ['max_neighbors']},
-        # pipeline_execution_queue=None,
-)
-def execute_pipeline(min_neighbors: int, max_neighbors: int) -> None:
-    
-    print('launch step one')
-    X, y = load_data()
-    train_X, test_X, train_y, test_y = train_test_split(X, y, test_size=0.3, random_state=42)
+def reduce_data(train_X, test_X, reducer):
 
-    print('launch step two')
-    scaler = fit_scaler(train_X)
-    train_X = scaler.transform(train_X)
-    test_X = scaler.transform(test_X)
-    
-    print('launch step three')
-    reducer = fit_reducer(train_X, train_y, n_components=5, random_state=42, n_neighbors=15)
     train_X = reducer.transform(train_X)
     test_X = reducer.transform(test_X)
+    return train_X, test_X
 
-    print('launch step four')
-    train_model(min_neighbors, max_neighbors, train_X, test_X, train_y, test_y)
+def scale_data(train_X, test_X, scaler):
+
+    train_X = scaler.transform(train_X)
+    test_X = scaler.transform(test_X)
+    return train_X, test_X
+
+def split_data(X, y):
+
+    from sklearn.model_selection import train_test_split
+
+    train_X, test_X, train_y, test_y = train_test_split(X, y, test_size=0.3, random_state=42)
+    return train_X, test_X, train_y, test_y
 
 
 if __name__ == '__main__':
-    PipelineDecorator.run_locally()
-    execute_pipeline(min_neighbors=2, max_neighbors=100)
-    print('Precessing done')
+    # create the pipeline controller
+    pipe = PipelineController(
+        project='digits_training',
+        name='Pipeline demo',
+        version='1.1',
+        add_pipeline_tags=False,
+        auto_version_bump=True
+    )
+
+    # set the default execution queue to be used (per step we can override the execution)
+    pipe.set_default_execution_queue('default')
+
+    # add parameters to the pipeline
+    pipe.add_parameter(
+        name='min_neighbors',
+        description='Minimum number of neighbors',
+        default = 2,
+        param_type=int,
+    )
+    pipe.add_parameter(
+        name='max_neighbors',
+        description='Maximum number of neighbors',
+        default = 100,
+        param_type=int,
+    )
+
+    # add pipeline components
+    pipe.add_function_step(
+        name='load_data',
+        function=load_data,
+        function_return=['X', 'y'],
+        cache_executed_step=True,
+    )
+    pipe.add_function_step(
+        name='split_data',
+        function=split_data,
+        parents=['load_data'],
+        function_kwargs=dict(X='${load_data.X}', y='${load_data.y}'),
+        function_return=['train_X', 'test_X', 'train_y', 'test_y'],
+        cache_executed_step=True
+    )
+    pipe.add_function_step(
+        name='scaler',
+        function=fit_scaler,
+        parents=['split_data'],
+        function_kwargs=dict(train_X='${split_data.train_X}'),
+        function_return=['scaler'],
+        cache_executed_step=True,
+    )
+    pipe.add_function_step(
+        name='norm_data',
+        function=scale_data,
+        parents=['scaler'],
+        function_kwargs=dict(train_X='${split_data.train_X}', test_X='${split_data.test_X}', scaler='${scaler.scaler}'),
+        function_return=['train_X', 'test_X'],
+        cache_executed_step=True,
+    )
+    pipe.add_function_step(
+        name='reducer',
+        function=fit_reducer,
+        parents=['norm_data'],
+        function_kwargs=dict(train_X='${norm_data.train_X}', train_y='${split_data.train_y}'),
+        function_return=['reducer'],
+        cache_executed_step=True,
+    )
+    pipe.add_function_step(
+        name='reduce_data',
+        function=reduce_data,
+        parents=['reducer'],
+        function_kwargs=dict(train_X='${norm_data.train_X}', test_X='${norm_data.test_X}', reducer='${reducer.reducer}'),
+        function_return=['train_X', 'test_X'],
+        cache_executed_step=True
+    )
+    pipe.add_function_step(
+        name='training_model',
+        function=train_model,
+        parents=['reduce_data'],
+        function_kwargs=dict(
+            min_neighbors='${pipeline.min_neighbors}', max_neighbors='${pipeline.max_neighbors}',
+            train_X='${reduce_data.train_X}', test_X='${reduce_data.test_X}',
+            train_y='${split_data.train_y}', test_y='${split_data.test_y}'
+        ),
+        function_return=['model'],
+        cache_executed_step=True,
+    )
+
+    # execute the pipeline
+    pipe.start_locally(run_pipeline_steps_locally=True)
+
+    print('Pipeline execution completed')
