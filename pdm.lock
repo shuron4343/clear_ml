@@ -45,6 +45,28 @@ dependencies = [
 ]
 
 [[package]]
+name = "boto3"
+version = "1.26.125"
+requires_python = ">= 3.7"
+summary = "The AWS SDK for Python"
+dependencies = [
+    "botocore<1.30.0,>=1.29.125",
+    "jmespath<2.0.0,>=0.7.1",
+    "s3transfer<0.7.0,>=0.6.0",
+]
+
+[[package]]
+name = "botocore"
+version = "1.29.125"
+requires_python = ">= 3.7"
+summary = "Low-level, data-driven core of boto 3."
+dependencies = [
+    "jmespath<2.0.0,>=0.7.1",
+    "python-dateutil<3.0.0,>=2.1",
+    "urllib3<1.27,>=1.25.4",
+]
+
+[[package]]
 name = "bottleneck"
 version = "1.3.7"
 summary = "Fast NumPy array functions written in C"
@@ -258,6 +280,12 @@ summary = "A very fast and expressive template engine."
 dependencies = [
     "MarkupSafe>=2.0",
 ]
+
+[[package]]
+name = "jmespath"
+version = "1.0.1"
+requires_python = ">=3.7"
+summary = "JSON Matching Expressions"
 
 [[package]]
 name = "joblib"
@@ -654,6 +682,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "s3transfer"
+version = "0.6.0"
+requires_python = ">= 3.7"
+summary = "An Amazon S3 Transfer Manager"
+dependencies = [
+    "botocore<2.0a.0,>=1.12.36",
+]
+
+[[package]]
 name = "scikit-learn"
 version = "1.2.2"
 requires_python = ">=3.8"
@@ -814,7 +851,7 @@ summary = "Backport of pathlib-compatible object wrapper for zip files"
 [metadata]
 lock_version = "4.2"
 groups = ["default", "jyputer", "sys_cert"]
-content_hash = "sha256:fb32a98e63e76484e7dd69e0b03351e42fc752e3b47680cabe241cd3a8c6df31"
+content_hash = "sha256:fdcc0e07380ff2e5b255b4125a44e1cadd02824eb0fbcc42e223bebc9829d690"
 
 [metadata.files]
 "appnope 0.1.3" = [
@@ -840,6 +877,14 @@ content_hash = "sha256:fb32a98e63e76484e7dd69e0b03351e42fc752e3b47680cabe241cd3a
 "bleach 6.0.0" = [
     {url = "http://nexus.bank-hlynov.ru/repository/pypi-mirror/packages/bleach/6.0.0/bleach-6.0.0-py3-none-any.whl", hash = "sha256:33c16e3353dbd13028ab4799a0f89a83f113405c766e9c122df8a06f5b85b3f4"},
     {url = "http://nexus.bank-hlynov.ru/repository/pypi-mirror/packages/bleach/6.0.0/bleach-6.0.0.tar.gz", hash = "sha256:1a1a85c1595e07d8db14c5f09f09e6433502c51c595970edc090551f0db99414"},
+]
+"boto3 1.26.125" = [
+    {url = "http://nexus.bank-hlynov.ru/repository/pypi-mirror/packages/boto3/1.26.125/boto3-1.26.125-py3-none-any.whl", hash = "sha256:6648aff15d19927cd26db47eb56362ccd313a1ddbd7aaa3235ef05d05d398252"},
+    {url = "http://nexus.bank-hlynov.ru/repository/pypi-mirror/packages/boto3/1.26.125/boto3-1.26.125.tar.gz", hash = "sha256:fe8248b80c4f0fdaed8b8779467c4431a5e52177e02ccd137d51ec51194ebb00"},
+]
+"botocore 1.29.125" = [
+    {url = "http://nexus.bank-hlynov.ru/repository/pypi-mirror/packages/botocore/1.29.125/botocore-1.29.125-py3-none-any.whl", hash = "sha256:ac87b63e9aa4231cd28941945024a0c4470c184c60334ebe5e1cae3544c785ed"},
+    {url = "http://nexus.bank-hlynov.ru/repository/pypi-mirror/packages/botocore/1.29.125/botocore-1.29.125.tar.gz", hash = "sha256:3005a7ffee083315e69938acdf1bfeaf9e21fe1fe1643d6573ee817721f4ffcd"},
 ]
 "bottleneck 1.3.7" = [
     {url = "http://nexus.bank-hlynov.ru/repository/pypi-mirror/packages/bottleneck/1.3.7/Bottleneck-1.3.7-cp310-cp310-macosx_10_9_x86_64.whl", hash = "sha256:ada1a9ff93fd6b1b19f12398a6761940372b00e53d86db98bd4613a751c60043"},
@@ -1180,6 +1225,10 @@ content_hash = "sha256:fb32a98e63e76484e7dd69e0b03351e42fc752e3b47680cabe241cd3a
 "jinja2 3.1.2" = [
     {url = "http://nexus.bank-hlynov.ru/repository/pypi-mirror/packages/jinja2/3.1.2/Jinja2-3.1.2-py3-none-any.whl", hash = "sha256:6088930bfe239f0e6710546ab9c19c9ef35e29792895fed6e6e31a023a182a61"},
     {url = "http://nexus.bank-hlynov.ru/repository/pypi-mirror/packages/jinja2/3.1.2/Jinja2-3.1.2.tar.gz", hash = "sha256:31351a702a408a9e7595a8fc6150fc3f43bb6bf7e319770cbc0db9df9437e852"},
+]
+"jmespath 1.0.1" = [
+    {url = "http://nexus.bank-hlynov.ru/repository/pypi-mirror/packages/jmespath/1.0.1/jmespath-1.0.1-py3-none-any.whl", hash = "sha256:02e2e4cc71b5bcab88332eebf907519190dd9e6e82107fa7f83b1003a6252980"},
+    {url = "http://nexus.bank-hlynov.ru/repository/pypi-mirror/packages/jmespath/1.0.1/jmespath-1.0.1.tar.gz", hash = "sha256:90261b206d6defd58fdd5e85f478bf633a2901798906be2ad389150c5c60edbe"},
 ]
 "joblib 1.2.0" = [
     {url = "http://nexus.bank-hlynov.ru/repository/pypi-mirror/packages/joblib/1.2.0/joblib-1.2.0-py3-none-any.whl", hash = "sha256:091138ed78f800342968c523bdde947e7a305b8594b910a0fea2ab83c3c6d385"},
@@ -1871,6 +1920,10 @@ content_hash = "sha256:fb32a98e63e76484e7dd69e0b03351e42fc752e3b47680cabe241cd3a
 "requests 2.28.2" = [
     {url = "http://nexus.bank-hlynov.ru/repository/pypi-mirror/packages/requests/2.28.2/requests-2.28.2-py3-none-any.whl", hash = "sha256:64299f4909223da747622c030b781c0d7811e359c37124b4bd368fb8c6518baa"},
     {url = "http://nexus.bank-hlynov.ru/repository/pypi-mirror/packages/requests/2.28.2/requests-2.28.2.tar.gz", hash = "sha256:98b1b2782e3c6c4904938b84c0eb932721069dfdb9134313beff7c83c2df24bf"},
+]
+"s3transfer 0.6.0" = [
+    {url = "http://nexus.bank-hlynov.ru/repository/pypi-mirror/packages/s3transfer/0.6.0/s3transfer-0.6.0-py3-none-any.whl", hash = "sha256:06176b74f3a15f61f1b4f25a1fc29a4429040b7647133a463da8fa5bd28d5ecd"},
+    {url = "http://nexus.bank-hlynov.ru/repository/pypi-mirror/packages/s3transfer/0.6.0/s3transfer-0.6.0.tar.gz", hash = "sha256:2ed07d3866f523cc561bf4a00fc5535827981b117dd7876f036b0c1aca42c947"},
 ]
 "scikit-learn 1.2.2" = [
     {url = "http://nexus.bank-hlynov.ru/repository/pypi-mirror/packages/scikit-learn/1.2.2/scikit-learn-1.2.2.tar.gz", hash = "sha256:8429aea30ec24e7a8c7ed8a3fa6213adf3814a6efbea09e16e0a0c71e1a1a3d7"},

@@ -27,8 +27,8 @@ def load_data() -> pd.DataFrame:
     import pandas as pd
 
     dataset_path = Dataset.get(
-        dataset_name="DigitsData",
-        dataset_project="digits-training",
+        dataset_name="digits",
+        dataset_project="Datasets",
     ).get_local_copy()
     print('dataset_path: ', dataset_path)
     df = pd.read_csv(Path(dataset_path, 'digits_data.csv'))
@@ -108,11 +108,12 @@ def split_data(X, y):
 
 
 if __name__ == '__main__':
+
     # create the pipeline controller
     pipe = PipelineController(
-        project='digits_training',
-        name='Pipeline demo',
-        version='1.1',
+        project='digits-training',
+        name='Pipeline demo s3',
+        version='0.1',
         add_pipeline_tags=False,
         auto_version_bump=True
     )
